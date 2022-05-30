@@ -1,0 +1,169 @@
+--- SDKDLL_orig.h	2022-05-30 01:20:12.301327600 -0600
++++ SDKDLL.h	2022-05-30 01:21:56.243801200 -0600
+@@ -2,6 +2,9 @@
+ //
+ 
+ #pragma once
++#include <stdbool.h>
++#include <Windows.h>
++
+ 
+ //#ifdef _WIN64
+ //	#pragma comment(lib,".\\lib\\x64\\SDKDLL.lib")
+@@ -22,25 +25,32 @@
+ #define MAX_LED_ROW		 7
+ #define MAX_LED_COLUMN	 24
+ 
+-
+-
+ struct KEY_COLOR {
+-
++#if defined(__cplusplus)
+ 	KEY_COLOR(BYTE _r, BYTE _g, BYTE _b): r(_r), g(_g), b(_b) {};
+ 	KEY_COLOR() {};
+-
++#endif
+ 	BYTE r;
+ 	BYTE g;
+ 	BYTE b;
+ };
+ 
++#if !defined(__cplusplus)
++typedef struct KEY_COLOR KEY_COLOR;
++#endif
++
+ //  set up/save the whole LED color structure
+ struct COLOR_MATRIX {
++#if defined(__cplusplus)
+ 	COLOR_MATRIX() {};
+-
++#endif
+ 	KEY_COLOR KeyColor[MAX_LED_ROW][MAX_LED_COLUMN];
+ };
+ 
++#if !defined(__cplusplus)
++typedef struct COLOR_MATRIX COLOR_MATRIX;
++#endif
++
+ typedef void (CALLBACK * KEY_CALLBACK)(int iRow, int iColumn, bool bPressed);
+ 
+ 
+@@ -65,8 +75,16 @@
+ //Enumeration of device layout
+ enum LAYOUT_KEYBOARD {LAYOUT_UNINIT = 0, LAYOUT_US = 1, LAYOUT_EU = 2, LAYOUT_JP = 3};
+ 
++#if !defined(__cplusplus)
++typedef enum EFF_INDEX EFF_INDEX;
++typedef enum DEVICE_INDEX DEVICE_INDEX;
++typedef enum LAYOUT_KEYBOARD LAYOUT_KEYBOARD;
++#endif
++
+ 
++#if defined(__cplusplus)
+ extern "C" {
++#endif
+ 	/*
+ 	@ Function Name: GetCM_SDK_DllVer
+ 	@ Detail: Get SDK Dll's Version
+@@ -96,7 +114,7 @@
+ 	@ Returns: LONG: 0 ~ 100 integer
+ 	@ Note:
+ 	@*/
+-	LONG	GetNowCPUUsage(DWORD * pErrorCode = NULL);
++	LONG	GetNowCPUUsage(DWORD * pErrorCode);
+ 
+ 
+ 	/*
+@@ -138,7 +156,7 @@
+ 	@ Returns: bool: true plugged in，false not plugged in
+ 	@ Note:
+ 	@*/
+-	bool	IsDevicePlug(DEVICE_INDEX devIndex = DEV_DEFAULT);
++	bool	IsDevicePlug(DEVICE_INDEX devIndex);
+ 
+ 
+ 	/*
+@@ -148,7 +166,7 @@
+ 	@ Returns: Returns LAYOUT_KEYBOARD enum: currently 3 LAYOUT_UNINIT , LAYOUT_US , LAYOUT_EU
+ 	@ Note:
+ 	@*/
+-	LAYOUT_KEYBOARD GetDeviceLayout(DEVICE_INDEX devIndex = DEV_DEFAULT);
++	LAYOUT_KEYBOARD GetDeviceLayout(DEVICE_INDEX devIndex);
+ 
+ 	/*
+ 	@ Function Name: EnableLedControl
+@@ -157,7 +175,7 @@
+ 	@ Returns: bool: true Success，false Fail
+ 	@ Note:
+ 	@*/
+-	bool EnableLedControl(bool bEnable, DEVICE_INDEX devIndex = DEV_DEFAULT);
++	bool EnableLedControl(bool bEnable, DEVICE_INDEX devIndex);
+ 
+ 
+ 
+@@ -168,7 +186,7 @@
+ 	@ Returns: bool: true Success，false Fail
+ 	@ Note:
+ 	@*/
+-	bool SwitchLedEffect(EFF_INDEX iEffectIndex, DEVICE_INDEX devIndex = DEV_DEFAULT);
++	bool SwitchLedEffect(EFF_INDEX iEffectIndex, DEVICE_INDEX devIndex);
+ 
+ 
+ 	/*
+@@ -178,7 +196,7 @@
+ 	@ Returns: bool: true success ， false fail
+ 	@ Note:
+ 	@*/
+-	bool RefreshLed(bool bAuto = false, DEVICE_INDEX devIndex = DEV_DEFAULT);
++	bool RefreshLed(bool bAuto, DEVICE_INDEX devIndex);
+ 
+ 
+ 	/*
+@@ -188,7 +206,7 @@
+ 	@ Returns: bool: true Success，false Fail
+ 	@ Note:
+ 	@*/
+-	bool SetFullLedColor(BYTE r, BYTE g, BYTE b, DEVICE_INDEX devIndex = DEV_DEFAULT);
++	bool SetFullLedColor(BYTE r, BYTE g, BYTE b, DEVICE_INDEX devIndex);
+ 
+ 
+ 	/*
+@@ -198,7 +216,7 @@
+ 	@ Returns: bool: true Success，false Fail
+ 	@ Note:
+ 	@*/
+-	bool SetAllLedColor(COLOR_MATRIX colorMatrix, DEVICE_INDEX devIndex = DEV_DEFAULT);
++	bool SetAllLedColor(COLOR_MATRIX colorMatrix, DEVICE_INDEX devIndex);
+ 
+ 
+ 	/*
+@@ -208,7 +226,7 @@
+ 	@ Returns: bool: true Success，false Fail
+ 	@ Note:
+ 	@*/
+-	bool SetLedColor(int iRow, int iColumn, BYTE r, BYTE g, BYTE b, DEVICE_INDEX devIndex = DEV_DEFAULT);
++	bool SetLedColor(int iRow, int iColumn, BYTE r, BYTE g, BYTE b, DEVICE_INDEX devIndex);
+ 
+ 
+ 	/*
+@@ -218,7 +236,7 @@
+ 	@ Returns: bool: true sucess ， false fail
+ 	@ Note: will call the call back function of SetKeyCallBack()
+ 	@*/
+-	bool EnableKeyInterrupt(bool bEnable, DEVICE_INDEX devIndex = DEV_DEFAULT);
++	bool EnableKeyInterrupt(bool bEnable, DEVICE_INDEX devIndex);
+ 
+ 
+ 	/*
+@@ -229,6 +247,8 @@
+ 	@ Note:
+ 	@*/
+ 
+-	void SetKeyCallBack(KEY_CALLBACK callback, DEVICE_INDEX devIndex = DEV_DEFAULT);
++	void SetKeyCallBack(KEY_CALLBACK callback, DEVICE_INDEX devIndex);
+ 
+-}
+\ No newline at end of file
++#if defined(__cplusplus)
++}
++#endif
