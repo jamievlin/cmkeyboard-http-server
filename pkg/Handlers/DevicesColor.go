@@ -28,6 +28,8 @@ func inByteRange(val int) bool {
 	return val >= 0 && val <= 255
 }
 
+// methods+types for putDeviceColor
+
 type RGBColor struct {
 	Red   int `json:"red"`
 	Green int `json:"green"`
@@ -64,6 +66,8 @@ func putDeviceColor(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 	w.WriteHeader(http.StatusOK)
 	pkg.WriteOutputMsg(w, []byte("{}"))
 }
+
+// method for putDeviceLedControl
 
 type putDeviceLedControlBody struct {
 	Enabled bool `json:"enabled"`
