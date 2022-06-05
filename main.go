@@ -17,107 +17,27 @@
 package main
 
 import (
-	"encoding/json"
-	"github.com/julienschmidt/httprouter"
-	"io"
 	Loggers "jamievlin.github.io/cmkeyboard-http-server/internal"
-	CmsdkInterface "jamievlin.github.io/cmkeyboard-http-server/pkg"
-	"log"
+	"jamievlin.github.io/cmkeyboard-http-server/pkg/CInterface"
+	"jamievlin.github.io/cmkeyboard-http-server/pkg/Handlers"
 	"net/http"
-	"strconv"
 )
 
-func rootHandler(
-	writer http.ResponseWriter,
-	_ *http.Request,
-	_ httprouter.Params) {
-	writer.WriteHeader(http.StatusOK)
-	_, err := writer.Write([]byte("{}"))
-	if err != nil {
-		Loggers.ErrorLogger.Print("rootHandler: ", err)
-	}
-}
-
-type putDeviceLedControlBody struct {
-	Enabled bool `json:"enabled"`
-}
-
-func putDeviceLedControl(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	var dev = params.ByName("device")
-	devInt, err := strconv.Atoi(dev)
-	if err != nil {
-		Loggers.ErrorLogger.Printf("Device %s unknown!", dev)
-		w.WriteHeader(http.StatusBadRequest)
-		_, err := w.Write([]byte("{}"))
-		if err != nil {
-			Loggers.ErrorLogger.Fatal("Cannot write response!", err)
-		}
-		return
-	}
-
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, err := w.Write([]byte("{}"))
-		if err != nil {
-			Loggers.ErrorLogger.Fatal("Cannot write response!", err)
-		}
-		return
-	}
-
-	var bodyParsed putDeviceLedControlBody
-	if json.Unmarshal(body, &bodyParsed) != nil {
-		log.Fatal("error!")
-	}
-
-	CmsdkInterface.EnableLedControl(bodyParsed.Enabled, uint(devInt))
-
-	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte("{}"))
-	if err != nil {
-		Loggers.ErrorLogger.Fatal("Cannot write response!")
-	}
-}
-
-func putDeviceColor(w http.ResponseWriter, _ *http.Request, params httprouter.Params) {
-	var dev = params.ByName("device")
-	devInt, err := strconv.Atoi(dev)
-	if err != nil {
-		Loggers.ErrorLogger.Printf("Device %s unknown!", dev)
-		w.WriteHeader(http.StatusBadRequest)
-		_, err := w.Write([]byte("{}"))
-		if err != nil {
-			Loggers.ErrorLogger.Fatal("Cannot write response!", err)
-		}
-		return
-	}
-
-	CmsdkInterface.SetFullLedColor(255, 255, 255, uint(devInt))
-
-	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte("{}"))
-	if err != nil {
-		Loggers.ErrorLogger.Fatal("Cannot write response!")
-	}
-}
-
-func initMux(router *httprouter.Router, prefix string) *http.ServeMux {
+func initMux(prefix string) *http.ServeMux {
 	mux := http.NewServeMux()
-	mux.Handle(prefix+"/", http.StripPrefix(prefix, router))
+	apiMux := http.NewServeMux()
+	Handlers.RegisterDeviceHandler(apiMux)
+
+	mux.Handle(prefix+"/", http.StripPrefix(prefix, apiMux))
 	return mux
 }
 
 func main() {
-	defer CmsdkInterface.EnableLedControl(false, 1)
+	defer CInterface.EnableLedControl(false, 1)
 
-	Loggers.InfoLogger.Printf("SDK Version %d", CmsdkInterface.GetCMSDKDllVer())
+	Loggers.InfoLogger.Printf("SDK Version %d", CInterface.GetCMSDKDllVer())
 
-	router := httprouter.New()
-	router.GET("/hello", rootHandler)
-	router.PUT("/devices/:device", putDeviceLedControl)
-	router.PUT("/devices/:device/color", putDeviceColor)
-	mux := initMux(router, "/api/v1")
-
+	mux := initMux("/api/v1")
 	err := http.ListenAndServe(":10007", mux)
 	if err != nil {
 		Loggers.ErrorLogger.Fatal(err)

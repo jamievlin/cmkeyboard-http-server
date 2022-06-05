@@ -14,14 +14,15 @@
  *    limitations under the License.
  */
 
-package CmsdkInterface
+package CInterface
 
-// #cgo CFLAGS: -I${SRCDIR}/../third_party/cmsdk/include/
-// #cgo LDFLAGS: -L${SRCDIR}/../third_party/cmsdk/lib/ -lSDKDLL64
+// #cgo CFLAGS: -I${SRCDIR}/../../third_party/cmsdk/include/
+// #cgo LDFLAGS: -L${SRCDIR}/../../third_party/cmsdk/lib/ -lSDKDLL64
 // #include "SDKDLL.h"
 import "C"
 import (
 	"fmt"
+	"jamievlin.github.io/cmkeyboard-http-server/pkg"
 )
 
 func GetCMSDKDllVer() int {
@@ -32,7 +33,7 @@ func GetRamUsage() uint32 {
 	return uint32(C.GetRamUsage())
 }
 
-func EnableLedControl(enabled bool, deviceIndex uint) error {
+func EnableLedControl(enabled bool, deviceIndex pkg.DeviceIndex) error {
 	ret := bool(C.EnableLedControl(C.bool(enabled), C.DEVICE_INDEX(deviceIndex)))
 	if ret {
 		return nil
@@ -41,7 +42,7 @@ func EnableLedControl(enabled bool, deviceIndex uint) error {
 	}
 }
 
-func SetFullLedColor(r byte, g byte, b byte, deviceIndex uint) error {
+func SetFullLedColor(r byte, g byte, b byte, deviceIndex pkg.DeviceIndex) error {
 	ret := bool(C.SetFullLedColor(
 		C.BYTE(r),
 		C.BYTE(g),
