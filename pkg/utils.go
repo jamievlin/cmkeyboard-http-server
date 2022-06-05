@@ -22,6 +22,7 @@ import (
 	"fmt"
 	Loggers "jamievlin.github.io/cmkeyboard-http-server/internal"
 	"net/http"
+	"strconv"
 )
 
 type ErrorResponse struct {
@@ -59,4 +60,37 @@ func RetrieveDeviceIndexOrLog(dev string, writer http.ResponseWriter) (DeviceInd
 	}
 
 	return devInt, nil
+}
+
+const (
+	MaxLedRow    int = 7
+	MaxLedColumn int = 24
+)
+
+func validateRowColumn(row int, column int) bool {
+	rowValid := row >= 0 && row < MaxLedRow
+	colValid := column >= 0 && column < MaxLedColumn
+
+	return rowValid && colValid
+}
+
+func ParseRowColOrLog(row string, column string, writer http.ResponseWriter) (int, int, error) {
+	rowInt, err := strconv.Atoi(row)
+	colInt, errCol := strconv.Atoi(column)
+
+	if err != nil || errCol != nil {
+		var errorMsg = fmt.Sprintf("cannot parse (row, index) = (%s, %s)", row, column)
+		Loggers.ErrorLogger.Print(errorMsg)
+		ReturnError(writer, &ErrorResponse{Message: errorMsg}, http.StatusBadRequest)
+		return 0, 0, errors.New("cannot retrieve index")
+	}
+
+	if !validateRowColumn(rowInt, colInt) {
+		var errorMsg = fmt.Sprintf("(row, index) of (%d, %d) is not valid!", rowInt, colInt)
+		Loggers.ErrorLogger.Print(errorMsg)
+		ReturnError(writer, &ErrorResponse{Message: errorMsg}, http.StatusBadRequest)
+		return 0, 0, errors.New("invalid row/column index")
+	}
+
+	return rowInt, colInt, nil
 }
