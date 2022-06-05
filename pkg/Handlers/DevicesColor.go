@@ -17,27 +17,46 @@
 package Handlers
 
 import (
-	"encoding/json"
 	"github.com/julienschmidt/httprouter"
-	"io"
 	Loggers "jamievlin.github.io/cmkeyboard-http-server/internal"
 	"jamievlin.github.io/cmkeyboard-http-server/pkg"
 	"jamievlin.github.io/cmkeyboard-http-server/pkg/CInterface"
 	"net/http"
 )
 
-type putDeviceLedControlBody struct {
-	Enabled bool `json:"enabled"`
+func inByteRange(val int) bool {
+	return val >= 0 && val <= 255
 }
 
-func putDeviceColor(w http.ResponseWriter, _ *http.Request, params httprouter.Params) {
+type RGBColor struct {
+	Red   int `json:"red"`
+	Green int `json:"green"`
+	Blue  int `json:"blue"`
+}
+
+func (body RGBColor) Validate() bool {
+	return inByteRange(body.Red) && inByteRange(body.Green) && inByteRange(body.Blue)
+}
+
+func (body RGBColor) toBytes() (byte, byte, byte) {
+	return byte(body.Red), byte(body.Green), byte(body.Blue)
+}
+
+func putDeviceColor(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	var dev = params.ByName("device")
 	devInt, err := pkg.RetrieveDeviceIndexOrLog(dev, w)
 	if err != nil {
 		return
 	}
 
-	if CInterface.SetFullLedColor(255, 255, 255, devInt) != nil {
+	bodyParsed, err := pkg.ReadValidatedResponseOrLog[RGBColor](w, r)
+	if err != nil {
+		return
+	}
+
+	red, green, blue := bodyParsed.toBytes()
+
+	if CInterface.SetFullLedColor(red, green, blue, devInt) != nil {
 		pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Cannot set Full LED"}, http.StatusInternalServerError)
 		return
 	}
