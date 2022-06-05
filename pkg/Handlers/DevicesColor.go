@@ -46,6 +46,14 @@ func putDeviceColor(w http.ResponseWriter, _ *http.Request, params httprouter.Pa
 	pkg.WriteOutputMsg(w, []byte("{}"))
 }
 
+type putDeviceLedControlBody struct {
+	Enabled bool `json:"enabled"`
+}
+
+func (body putDeviceLedControlBody) Validate() bool {
+	return true
+}
+
 func putDeviceLedControl(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	var dev = params.ByName("device")
 	devInt, err := pkg.RetrieveDeviceIndexOrLog(dev, w)
@@ -53,16 +61,8 @@ func putDeviceLedControl(w http.ResponseWriter, r *http.Request, params httprout
 		return
 	}
 
-	body, err := io.ReadAll(r.Body)
+	bodyParsed, err := pkg.ReadValidatedResponseOrLog[putDeviceLedControlBody](w, r)
 	if err != nil {
-		pkg.ReturnError(w, &pkg.ErrorResponse{Message: ""}, http.StatusInternalServerError)
-		return
-	}
-
-	var bodyParsed putDeviceLedControlBody
-	if json.Unmarshal(body, &bodyParsed) != nil {
-		Loggers.ErrorLogger.Print("Cannot unmarshal response")
-		pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Cannot unmarshal response"}, http.StatusBadRequest)
 		return
 	}
 
