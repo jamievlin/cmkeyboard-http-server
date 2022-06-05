@@ -23,7 +23,6 @@ import (
 	Loggers "jamievlin.github.io/cmkeyboard-http-server/internal"
 	"jamievlin.github.io/cmkeyboard-http-server/pkg"
 	"jamievlin.github.io/cmkeyboard-http-server/pkg/CInterface"
-	"log"
 	"net/http"
 )
 
@@ -33,61 +32,48 @@ type putDeviceLedControlBody struct {
 
 func putDeviceColor(w http.ResponseWriter, _ *http.Request, params httprouter.Params) {
 	var dev = params.ByName("device")
-	devInt, err := pkg.GetDeviceIndexFromString(dev)
+	devInt, err := pkg.RetrieveDeviceIndexOrLog(dev, w)
 	if err != nil {
-		Loggers.ErrorLogger.Printf("Device %s unknown!", dev)
-		w.WriteHeader(http.StatusBadRequest)
-		_, err := w.Write([]byte("{}"))
-		if err != nil {
-			Loggers.ErrorLogger.Fatal("Cannot write response!", err)
-		}
 		return
 	}
 
-	CInterface.SetFullLedColor(255, 255, 255, devInt)
+	if CInterface.SetFullLedColor(255, 255, 255, devInt) != nil {
+		pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Cannot set Full LED"}, http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte("{}"))
-	if err != nil {
-		Loggers.ErrorLogger.Fatal("Cannot write response!")
-	}
+	pkg.WriteOutputMsg(w, []byte("{}"))
 }
 
 func putDeviceLedControl(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	var dev = params.ByName("device")
-	devInt, err := pkg.GetDeviceIndexFromString(dev)
+	devInt, err := pkg.RetrieveDeviceIndexOrLog(dev, w)
 	if err != nil {
-		Loggers.ErrorLogger.Printf("Device %s unknown!", dev)
-		w.WriteHeader(http.StatusBadRequest)
-		_, err := w.Write([]byte("{}"))
-		if err != nil {
-			Loggers.ErrorLogger.Fatal("Cannot write response!", err)
-		}
 		return
 	}
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, err := w.Write([]byte("{}"))
-		if err != nil {
-			Loggers.ErrorLogger.Fatal("Cannot write response!", err)
-		}
+		pkg.ReturnError(w, &pkg.ErrorResponse{Message: ""}, http.StatusInternalServerError)
 		return
 	}
 
 	var bodyParsed putDeviceLedControlBody
 	if json.Unmarshal(body, &bodyParsed) != nil {
-		log.Fatal("error!")
+		Loggers.ErrorLogger.Print("Cannot unmarshal response")
+		pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Cannot unmarshal response"}, http.StatusBadRequest)
+		return
 	}
 
-	CInterface.EnableLedControl(bodyParsed.Enabled, devInt)
+	if CInterface.EnableLedControl(bodyParsed.Enabled, devInt) != nil {
+		Loggers.ErrorLogger.Print("Cannot set LED Control")
+		pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Cannot set LED Control"}, http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
-	_, err = w.Write([]byte("{}"))
-	if err != nil {
-		Loggers.ErrorLogger.Fatal("Cannot write response!")
-	}
+	pkg.WriteOutputMsg(w, []byte("{}"))
 }
 
 func createDeviceHandler() http.Handler {
