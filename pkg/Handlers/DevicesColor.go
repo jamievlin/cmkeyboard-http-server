@@ -99,11 +99,49 @@ func putDeviceLedControl(w http.ResponseWriter, r *http.Request, params httprout
 	pkg.WriteOutputMsg(w, []byte("{}"))
 }
 
+// register + main functions
+
+func putDeviceKeyColor(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	devInt, err := pkg.RetrieveDeviceIndexOrLog(
+		params.ByName("device"), w)
+	if err != nil {
+		return
+	}
+
+	row, col, err := pkg.ParseRowColOrLog(
+		params.ByName("row"),
+		params.ByName("col"),
+		w)
+	if err != nil {
+		return
+	}
+
+	bodyParsed, err := pkg.ReadValidatedResponseOrLog[RGBColor](w, r)
+	if err != nil {
+		return
+	}
+
+	red, green, blue := bodyParsed.toBytes()
+
+	if CInterface.SetLedColor(
+		row, col,
+		red, green, blue,
+		devInt) != nil {
+		Loggers.ErrorLogger.Print("Cannot set LED Control for key")
+		pkg.ReturnError(
+			w,
+			&pkg.ErrorResponse{Message: "Cannot set LED Control for key"},
+			http.StatusInternalServerError)
+		return
+	}
+}
+
 func createDeviceHandler() http.Handler {
 	router := httprouter.New()
 
 	router.PUT("/:device", putDeviceLedControl)
 	router.PUT("/:device/color", putDeviceColor)
+	router.PUT("/:device/color/:row/:col", putDeviceKeyColor)
 	return router
 }
 
