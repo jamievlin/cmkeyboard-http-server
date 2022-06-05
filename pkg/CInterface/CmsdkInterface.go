@@ -59,3 +59,21 @@ func SetFullLedColor(r byte, g byte, b byte, deviceIndex pkg.DeviceIndex) error 
 			deviceIndex)
 	}
 }
+
+func SetLedColor(row int, column int, r byte, g byte, b byte, deviceIndex pkg.DeviceIndex) error {
+	ret := bool(C.SetLedColor(
+		C.int(row), C.int(column),
+		C.BYTE(r), C.BYTE(g), C.BYTE(b),
+		C.DEVICE_INDEX(deviceIndex),
+	))
+
+	if ret {
+		return nil
+	} else {
+		return fmt.Errorf(
+			"SetLedColor on key (%d, %d) with color (%d, %d, %d) failed on device (%d)",
+			row, column,
+			r, g, b,
+			deviceIndex)
+	}
+}
