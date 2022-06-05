@@ -16,27 +16,16 @@
 
 package main
 
-// #cgo CFLAGS: -I${SRCDIR}/contrib/cmsdk/include/
-// #cgo LDFLAGS: -L${SRCDIR}/contrib/cmsdk/lib/ -lSDKDLL64
-// #include "SDKDLL.h"
-import "C"
 import (
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"io"
+	Loggers "jamievlin.github.io/cmkeyboard-http-server/internal"
+	CmsdkInterface "jamievlin.github.io/cmkeyboard-http-server/pkg"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 )
-
-var (
-	errorLogger *log.Logger
-)
-
-func init() {
-	errorLogger = log.New(os.Stderr, "[ERROR] ", log.LstdFlags)
-}
 
 func rootHandler(
 	writer http.ResponseWriter,
@@ -45,7 +34,7 @@ func rootHandler(
 	writer.WriteHeader(http.StatusOK)
 	_, err := writer.Write([]byte("{}"))
 	if err != nil {
-		errorLogger.Print("rootHandler: ", err)
+		Loggers.ErrorLogger.Print("rootHandler: ", err)
 	}
 }
 
@@ -57,11 +46,11 @@ func putDeviceLedControl(w http.ResponseWriter, r *http.Request, params httprout
 	var dev = params.ByName("device")
 	devInt, err := strconv.Atoi(dev)
 	if err != nil {
-		errorLogger.Printf("Device %s unknown!", dev)
+		Loggers.ErrorLogger.Printf("Device %s unknown!", dev)
 		w.WriteHeader(http.StatusBadRequest)
 		_, err := w.Write([]byte("{}"))
 		if err != nil {
-			errorLogger.Fatal("Cannot write response!", err)
+			Loggers.ErrorLogger.Fatal("Cannot write response!", err)
 		}
 		return
 	}
@@ -71,7 +60,7 @@ func putDeviceLedControl(w http.ResponseWriter, r *http.Request, params httprout
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err := w.Write([]byte("{}"))
 		if err != nil {
-			errorLogger.Fatal("Cannot write response!", err)
+			Loggers.ErrorLogger.Fatal("Cannot write response!", err)
 		}
 		return
 	}
@@ -81,12 +70,12 @@ func putDeviceLedControl(w http.ResponseWriter, r *http.Request, params httprout
 		log.Fatal("error!")
 	}
 
-	C.EnableLedControl(C.bool(bodyParsed.Enabled), C.DEVICE_INDEX(devInt))
+	CmsdkInterface.EnableLedControl(bodyParsed.Enabled, uint(devInt))
 
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write([]byte("{}"))
 	if err != nil {
-		errorLogger.Fatal("Cannot write response!")
+		Loggers.ErrorLogger.Fatal("Cannot write response!")
 	}
 }
 
@@ -94,21 +83,21 @@ func putDeviceColor(w http.ResponseWriter, _ *http.Request, params httprouter.Pa
 	var dev = params.ByName("device")
 	devInt, err := strconv.Atoi(dev)
 	if err != nil {
-		errorLogger.Printf("Device %s unknown!", dev)
+		Loggers.ErrorLogger.Printf("Device %s unknown!", dev)
 		w.WriteHeader(http.StatusBadRequest)
 		_, err := w.Write([]byte("{}"))
 		if err != nil {
-			errorLogger.Fatal("Cannot write response!", err)
+			Loggers.ErrorLogger.Fatal("Cannot write response!", err)
 		}
 		return
 	}
 
-	C.SetFullLedColor(255, 255, 255, C.DEVICE_INDEX(devInt))
+	CmsdkInterface.SetFullLedColor(255, 255, 255, uint(devInt))
 
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write([]byte("{}"))
 	if err != nil {
-		errorLogger.Fatal("Cannot write response!")
+		Loggers.ErrorLogger.Fatal("Cannot write response!")
 	}
 }
 
@@ -119,7 +108,9 @@ func initMux(router *httprouter.Router, prefix string) *http.ServeMux {
 }
 
 func main() {
-	defer C.EnableLedControl(false, 1)
+	defer CmsdkInterface.EnableLedControl(false, 1)
+
+	Loggers.InfoLogger.Printf("SDK Version %d", CmsdkInterface.GetCMSDKDllVer())
 
 	router := httprouter.New()
 	router.GET("/hello", rootHandler)
@@ -129,6 +120,6 @@ func main() {
 
 	err := http.ListenAndServe(":10007", mux)
 	if err != nil {
-		errorLogger.Fatal(err)
+		Loggers.ErrorLogger.Fatal(err)
 	}
 }
