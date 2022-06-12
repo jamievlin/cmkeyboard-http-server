@@ -96,7 +96,7 @@ func putDeviceColor(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 
 	if mode == "all" {
 		body, res := createRGBColor(&rawBody)
-		if !res {
+		if !res || !body.Validate() {
 			pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Cannot parse body!"}, http.StatusInternalServerError)
 			return
 		}
