@@ -80,15 +80,37 @@ func putDeviceColor(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 		return
 	}
 
-	bodyParsed, err := pkg.ReadValidatedResponseOrLog[RGBColor](w, r)
+	bodyParsed, err := pkg.ReadResponseOrLog[map[string]interface{}](w, r)
 	if err != nil {
 		return
 	}
 
-	red, green, blue := bodyParsed.toBytes()
+	mode, ok := (*bodyParsed)["mode"]
+	rawBody, okb := (*bodyParsed)["body"]
+	if !(ok && okb) {
+		pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Mode is required"}, http.StatusBadRequest)
+		return
+	}
 
-	if CInterface.SetFullLedColor(red, green, blue, devInt) != nil {
-		pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Cannot set Full LED"}, http.StatusInternalServerError)
+	result := false
+
+	if mode == "all" {
+		body, res := createRGBColor(&rawBody)
+		if !res {
+			pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Cannot parse body!"}, http.StatusInternalServerError)
+			return
+		}
+		result = true
+		red, green, blue := body.toBytes()
+
+		if CInterface.SetFullLedColor(red, green, blue, devInt) != nil {
+			pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Cannot set Full LED"}, http.StatusInternalServerError)
+			return
+		}
+	}
+
+	if !result {
+		pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Mode must be all or matrix!"}, http.StatusBadRequest)
 		return
 	}
 
