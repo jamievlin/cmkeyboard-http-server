@@ -28,7 +28,7 @@ type ValidableResponse interface {
 	Validate() bool
 }
 
-func ReadValidatedResponseOrLog[K ValidableResponse](w http.ResponseWriter, r *http.Request) (*K, error) {
+func ReadResponseOrLog[K any](w http.ResponseWriter, r *http.Request) (*K, error) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		ReturnError(w, &ErrorResponse{Message: "Cannot read message!"}, http.StatusInternalServerError)
@@ -36,11 +36,25 @@ func ReadValidatedResponseOrLog[K ValidableResponse](w http.ResponseWriter, r *h
 	}
 
 	var bodyParsed K
-	if json.Unmarshal(body, &bodyParsed) != nil || !bodyParsed.Validate() {
+	if json.Unmarshal(body, &bodyParsed) != nil {
 		Loggers.ErrorLogger.Print("Invalid Response!")
 		ReturnError(w, &ErrorResponse{Message: "Invalid response"}, http.StatusBadRequest)
 		return nil, errors.New("parse error")
 	}
 
 	return &bodyParsed, nil
+}
+
+func ReadValidatedResponseOrLog[K ValidableResponse](w http.ResponseWriter, r *http.Request) (*K, error) {
+	ret, err := ReadResponseOrLog[K](w, r)
+	if err != nil {
+		return nil, errors.New("parse error")
+	}
+	if !(*ret).Validate() {
+		Loggers.ErrorLogger.Print("validation failed for body!")
+		ReturnError(w, &ErrorResponse{Message: "validation failed for body!"}, http.StatusBadRequest)
+		return nil, errors.New("validation failed for body")
+	}
+
+	return ret, nil
 }
