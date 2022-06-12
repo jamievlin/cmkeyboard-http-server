@@ -77,3 +77,38 @@ func SetLedColor(row int, column int, r byte, g byte, b byte, deviceIndex pkg.De
 			deviceIndex)
 	}
 }
+
+type CmKeyColor struct {
+	Red   byte
+	Green byte
+	Blue  byte
+}
+
+type CmColorMatrix [pkg.MaxLedRow][pkg.MaxLedColumn]CmKeyColor
+
+func (km *CmColorMatrix) CreateKeyColor() *C.COLOR_MATRIX {
+	var newKm C.COLOR_MATRIX
+
+	for i, kmCol := range km {
+		for j, kmEntry := range kmCol {
+			entry := &newKm.KeyColor[i][j]
+			entry.r = C.BYTE(kmEntry.Red)
+			entry.g = C.BYTE(kmEntry.Green)
+			entry.b = C.BYTE(kmEntry.Blue)
+		}
+	}
+	return &newKm
+}
+
+func SetAllLedColor(colorMatrix *CmColorMatrix, deviceIndex pkg.DeviceIndex) error {
+	ret := bool(C.SetAllLedColor(
+		*colorMatrix.CreateKeyColor(),
+		C.DEVICE_INDEX(deviceIndex),
+	))
+
+	if ret {
+		return nil
+	} else {
+		return fmt.Errorf("SetAllLedColor on deviceIndex %d failed", deviceIndex)
+	}
+}
