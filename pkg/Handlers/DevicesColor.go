@@ -73,6 +73,39 @@ func createRGBColor(data *interface{}) (*RGBColor, bool) {
 	return &ret, true
 }
 
+func createColorMatrix(data *interface{}) (*CInterface.CmColorMatrix, bool) {
+	var ret CInterface.CmColorMatrix
+
+	arr, ok := (*data).([]any)
+	if !ok || len(arr) != pkg.MaxLedRow {
+		Loggers.ErrorLogger.Printf("Length of row is not %d!", pkg.MaxLedRow)
+		return nil, false
+	}
+
+	for i, col := range arr {
+		colArr, okv := col.([]any)
+		if !okv || len(colArr) != pkg.MaxLedColumn {
+			Loggers.ErrorLogger.Printf("Length of col at row %d is not %d!", i, pkg.MaxLedColumn)
+			return nil, false
+		}
+
+		for j, entry := range colArr {
+			rgbColor, ok3 := createRGBColor(&entry)
+			if !ok3 || !rgbColor.Validate() {
+				Loggers.ErrorLogger.Printf("Cannot create rgb color at entry (%d, %d)", i, j)
+				return nil, false
+			}
+			vr, vg, vb := rgbColor.toBytes()
+
+			keyEntry := &ret[i][j]
+			keyEntry.Red = vr
+			keyEntry.Green = vg
+			keyEntry.Blue = vb
+		}
+	}
+	return &ret, true
+}
+
 func putDeviceColor(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	var dev = params.ByName("device")
 	devInt, err := pkg.RetrieveDeviceIndexOrLog(dev, w)
@@ -85,14 +118,18 @@ func putDeviceColor(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 		return
 	}
 
-	mode, ok := (*bodyParsed)["mode"]
+	modeRaw, ok := (*bodyParsed)["mode"]
 	rawBody, okb := (*bodyParsed)["body"]
-	if !(ok && okb) {
-		pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Mode is required"}, http.StatusBadRequest)
+	mode, okc := modeRaw.(string)
+	if !(ok && okb && okc) {
+		Loggers.ErrorLogger.Printf("Cannot retrieve mode or body")
+		pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Mode and Body are required"}, http.StatusBadRequest)
 		return
 	}
 
 	result := false
+
+	Loggers.InfoLogger.Printf("Processing response, mode = %s", mode)
 
 	if mode == "all" {
 		body, res := createRGBColor(&rawBody)
@@ -107,9 +144,22 @@ func putDeviceColor(w http.ResponseWriter, r *http.Request, params httprouter.Pa
 			pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Cannot set Full LED"}, http.StatusInternalServerError)
 			return
 		}
+	} else if mode == "matrix" {
+		body, res := createColorMatrix(&rawBody)
+		if !res {
+			pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Cannot parse body!"}, http.StatusInternalServerError)
+			return
+		}
+
+		result = true
+		if CInterface.SetAllLedColor(body, devInt) != nil {
+			pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Cannot set LED Matrix"}, http.StatusInternalServerError)
+			return
+		}
 	}
 
 	if !result {
+		Loggers.ErrorLogger.Printf("Mode %s is invalid", mode)
 		pkg.ReturnError(w, &pkg.ErrorResponse{Message: "Mode must be all or matrix!"}, http.StatusBadRequest)
 		return
 	}
