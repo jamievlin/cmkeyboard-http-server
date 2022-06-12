@@ -44,6 +44,35 @@ func (body RGBColor) toBytes() (byte, byte, byte) {
 	return byte(body.Red), byte(body.Green), byte(body.Blue)
 }
 
+func createRGBColor(data *interface{}) (*RGBColor, bool) {
+	var ret RGBColor
+	res, ok := (*data).(map[string]interface{})
+	if !ok {
+		return nil, false
+	}
+
+	vr, okr := res["red"]
+	vg, okg := res["green"]
+	vb, okb := res["blue"]
+
+	if !(okr && okg && okb) {
+		return nil, false
+	}
+
+	rv, okrv := vr.(float64)
+	rg, okrg := vg.(float64)
+	rb, okrb := vb.(float64)
+
+	if !(okrv && okrg && okrb) {
+		return nil, false
+	}
+
+	ret.Red = int(rv)
+	ret.Green = int(rg)
+	ret.Blue = int(rb)
+	return &ret, true
+}
+
 func putDeviceColor(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	var dev = params.ByName("device")
 	devInt, err := pkg.RetrieveDeviceIndexOrLog(dev, w)
