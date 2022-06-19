@@ -25,6 +25,7 @@ func createDeviceHandler() http.Handler {
 	router := httprouter.New()
 
 	router.PUT("/:device", putDeviceLedControl)
+	router.GET("/:device", getDevicesPluggedIn)
 	router.PUT("/:device/color", putDeviceColor)
 	router.PUT("/:device/color/:row/:col", putDeviceKeyColor)
 	return router
