@@ -35,7 +35,12 @@ func initMux(prefix string) *http.ServeMux {
 }
 
 func main() {
-	defer CInterface.EnableLedControl(false, 1)
+	defer func() {
+		err := CInterface.EnableLedControl(false, 1)
+		if err != nil {
+			Loggers.ErrorLogger.Printf("Error in disabling LED Control")
+		}
+	}()
 
 	Loggers.InfoLogger.Printf("SDK Version %d", CInterface.GetCMSDKDllVer())
 
