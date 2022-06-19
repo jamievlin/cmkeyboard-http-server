@@ -33,6 +33,10 @@ func GetRamUsage() uint32 {
 	return uint32(C.GetRamUsage())
 }
 
+func GetNowVolumePeekValue() float32 {
+	return float32(C.GetNowVolumePeekValue())
+}
+
 func EnableLedControl(enabled bool, deviceIndex pkg.DeviceIndex) error {
 	ret := bool(C.EnableLedControl(C.bool(enabled), C.DEVICE_INDEX(deviceIndex)))
 	if ret {
