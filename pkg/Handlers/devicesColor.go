@@ -236,17 +236,3 @@ func putDeviceKeyColor(w http.ResponseWriter, r *http.Request, params httprouter
 		return
 	}
 }
-
-func createDeviceHandler() http.Handler {
-	router := httprouter.New()
-
-	router.PUT("/:device", putDeviceLedControl)
-	router.PUT("/:device/color", putDeviceColor)
-	router.PUT("/:device/color/:row/:col", putDeviceKeyColor)
-	return router
-}
-
-func RegisterDeviceHandler(mux *http.ServeMux) {
-	deviceHandler := createDeviceHandler()
-	mux.Handle("/devices/", http.StripPrefix("/devices", deviceHandler))
-}
