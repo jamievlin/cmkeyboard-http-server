@@ -116,3 +116,9 @@ func SetAllLedColor(colorMatrix *CmColorMatrix, deviceIndex pkg.DeviceIndex) err
 		return fmt.Errorf("SetAllLedColor on deviceIndex %d failed", deviceIndex)
 	}
 }
+
+// device info
+
+func IsDevicePlug(deviceIndex pkg.DeviceIndex) bool {
+	return bool(C.IsDevicePlug(C.DEVICE_INDEX(deviceIndex)))
+}
