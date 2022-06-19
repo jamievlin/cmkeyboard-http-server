@@ -26,7 +26,9 @@ import (
 func initMux(prefix string) *http.ServeMux {
 	mux := http.NewServeMux()
 	apiMux := http.NewServeMux()
+
 	Handlers.RegisterDeviceHandler(apiMux)
+	Handlers.RegisterSysHandler(apiMux)
 
 	mux.Handle(prefix+"/", http.StripPrefix(prefix, apiMux))
 	return mux
