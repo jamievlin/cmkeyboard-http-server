@@ -3,4 +3,11 @@
   <component name="ProjectRootManager">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
+  <component name="SwUserDefinedSpecifications">
+    <option name="specTypeByUrl">
+      <map>
+        <entry key="file://$PROJECT_DIR$/api/paramObjects.yaml" value="openapi30" />
+      </map>
+    </option>
+  </component>
 </project>

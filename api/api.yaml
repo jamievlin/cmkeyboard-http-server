@@ -63,3 +63,23 @@ paths:
                     description: Ram percentage between 0 - 100
                     type: number
                     example: 35
+  /devices/{device}:
+    get:
+      description: Get hardware information about device
+      operationId: getDeviceInfo
+      parameters:
+        - $ref: 'paramObjects.yaml#/parameters/device'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - plugged_in
+                properties:
+                  plugged_in:
+                    description: Whether the specified device is plugged in
+                    type: boolean
+                    example: true

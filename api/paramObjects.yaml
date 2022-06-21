@@ -1,0 +1,8 @@
+parameters:
+  device:
+    name: device
+    in: path
+    description: Device number, as per Coolermaster SDK documentation
+    required: true
+    schema:
+      type: integer
