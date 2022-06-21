@@ -83,6 +83,8 @@ paths:
                     description: Whether the specified device is plugged in
                     type: boolean
                     example: true
+        '500':
+          $ref: './errorTypes.yaml#/errorCodes/500'
     put:
       description: Set device RGB properties
       operationId: putDeviceInfo
@@ -105,6 +107,10 @@ paths:
       responses:
         '200':
           description: Successful
+        '400':
+          $ref: './errorTypes.yaml#/errorCodes/400'
+        '500':
+          $ref: './errorTypes.yaml#/errorCodes/500'
   /devices/{device}/color/{row}/{col}:
     put:
       description: Set individual key's RGB Color
