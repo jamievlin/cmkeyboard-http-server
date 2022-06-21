@@ -18,25 +18,15 @@ package Handlers
 
 import (
 	"github.com/julienschmidt/httprouter"
+	"jamievlin.github.io/cmkeyboard-http-server/pkg"
 	"net/http"
+	"strings"
 )
 
-func createDeviceHandler() http.Handler {
-	router := httprouter.New()
-
-	router.PUT("/:device", putDeviceLedControl)
-	router.GET("/:device", getDevicesPluggedIn)
-	router.OPTIONS("/:device", createOptionsHandler(&[]string{"GET", "PUT"}))
-
-	router.PUT("/:device/color", putDeviceColor)
-	router.OPTIONS("/:device/color", createOptionsHandler(&[]string{"PUT"}))
-
-	router.PUT("/:device/color/:row/:col", putDeviceKeyColor)
-	router.OPTIONS("/:device/color/:row/:col", createOptionsHandler(&[]string{"PUT"}))
-	return router
-}
-
-func RegisterDeviceHandler(mux *http.ServeMux) {
-	deviceHandler := createDeviceHandler()
-	mux.Handle("/devices/", http.StripPrefix("/devices", deviceHandler))
+func createOptionsHandler(methods *[]string) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		pkg.InitResponse(&w)
+		w.Header().Set("Access-Control-Allow-Methods", strings.Join(*methods, ", "))
+		w.WriteHeader(200)
+	}
 }

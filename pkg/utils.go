@@ -29,11 +29,17 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
-func InitResponse(w http.ResponseWriter) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Accept-Encoding", "UTF-8")
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Encoding", "UTF-8")
+func InitResponse(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Content-Type", "application/json")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	(*w).Header().Set("Content-Encoding", "UTF-8")
+}
+
+func InitResponseWithBody(w *http.ResponseWriter) {
+	InitResponse(w)
+	(*w).Header().Set("Accept", "application/json")
+	(*w).Header().Set("Accept-Encoding", "UTF-8")
 }
 
 func WriteOutputMsg(writer http.ResponseWriter, message []byte) {

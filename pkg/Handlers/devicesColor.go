@@ -107,6 +107,8 @@ func createColorMatrix(data *interface{}) (*CInterface.CmColorMatrix, bool) {
 }
 
 func putDeviceColor(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	pkg.InitResponseWithBody(&w)
+
 	var dev = params.ByName("device")
 	devInt, err := pkg.RetrieveDeviceIndexOrLog(dev, w)
 	if err != nil {
@@ -179,6 +181,8 @@ func (body putDeviceLedControlBody) Validate() bool {
 }
 
 func putDeviceLedControl(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	pkg.InitResponseWithBody(&w)
+
 	var dev = params.ByName("device")
 	devInt, err := pkg.RetrieveDeviceIndexOrLog(dev, w)
 	if err != nil {
@@ -203,6 +207,8 @@ func putDeviceLedControl(w http.ResponseWriter, r *http.Request, params httprout
 // register + main functions
 
 func putDeviceKeyColor(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	pkg.InitResponseWithBody(&w)
+
 	devInt, err := pkg.RetrieveDeviceIndexOrLog(
 		params.ByName("device"), w)
 	if err != nil {

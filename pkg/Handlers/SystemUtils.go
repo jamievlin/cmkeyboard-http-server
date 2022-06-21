@@ -30,7 +30,7 @@ type cmsdkVersionResponse struct {
 }
 
 func getCmsdkVersion(w http.ResponseWriter, _ *http.Request) {
-	pkg.InitResponse(w)
+	pkg.InitResponse(&w)
 
 	retBody := cmsdkVersionResponse{Version: CInterface.GetCMSDKDllVer()}
 
@@ -50,7 +50,7 @@ type cmsdkVolumeData struct {
 }
 
 func getPeakVolume(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
-	pkg.InitResponse(w)
+	pkg.InitResponse(&w)
 
 	retBody := cmsdkVolumeData{PeakVolume: CInterface.GetNowVolumePeekValue()}
 
@@ -70,7 +70,7 @@ type cmsdkRamData struct {
 }
 
 func getRamData(w http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
-	pkg.InitResponse(w)
+	pkg.InitResponse(&w)
 
 	retBody := cmsdkRamData{RamPercentage: CInterface.GetRamUsage()}
 
