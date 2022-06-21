@@ -30,6 +30,8 @@ type devicesPluggedInInfo struct {
 }
 
 func getDevicesPluggedIn(w http.ResponseWriter, _ *http.Request, params httprouter.Params) {
+	pkg.InitResponse(w)
+
 	var dev = params.ByName("device")
 	devInt, err := pkg.RetrieveDeviceIndexOrLog(dev, w)
 	if err != nil {

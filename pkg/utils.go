@@ -29,6 +29,13 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
+func InitResponse(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Accept-Encoding", "UTF-8")
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Encoding", "UTF-8")
+}
+
 func WriteOutputMsg(writer http.ResponseWriter, message []byte) {
 	n, err := writer.Write(message)
 	if err != nil {
