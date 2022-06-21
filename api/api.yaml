@@ -105,3 +105,40 @@ paths:
       responses:
         '200':
           description: Successful
+  /devices/{device}/color/{row}/{col}:
+    put:
+      description: Set individual key's RGB Color
+      operationId: putDeviceColorKey
+      parameters:
+        - $ref: './paramObjects.yaml#/parameters/device'
+        - in: path
+          name: row
+          required: true
+          description: Row of the keyboard to set LED color
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 7
+            exclusiveMaximum: true
+        - in: path
+          name: col
+          required: true
+          description: Column of keybaoard to set LED color
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 24
+            exclusiveMaximum: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './bodyTypes.yaml#/requestTypes/RGBColor'
+      responses:
+        '200':
+          description: Successful
+        '400':
+          $ref: './errorTypes.yaml#/errorCodes/400'
+        '500':
+          $ref: './errorTypes.yaml#/errorCodes/500'
