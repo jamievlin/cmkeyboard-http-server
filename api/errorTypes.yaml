@@ -12,10 +12,10 @@ errorCodes:
     content:
       application/json:
         schema:
-          $ref: '#/baseTypes/errorMsg'
+          $ref: './errorTypes.yaml#/baseTypes/errorMsg'
   500:
     description: SDK or error in server component
     content:
       application/json:
         schema:
-          $ref: '#/baseTypes/errorMsg'
+          $ref: './errorTypes.yaml#/baseTypes/errorMsg'

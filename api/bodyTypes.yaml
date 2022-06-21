@@ -9,11 +9,11 @@ requestTypes:
     type: object
     properties:
       red:
-        $ref: '#/baseTypes/byte'
+        $ref: './bodyTypes.yaml#/baseTypes/byte'
       green:
-        $ref: '#/baseTypes/byte'
+        $ref: './bodyTypes.yaml#/baseTypes/byte'
       blue:
-        $ref: '#/baseTypes/byte'
+        $ref: './bodyTypes.yaml#/baseTypes/byte'
     required:
       - red
       - green
