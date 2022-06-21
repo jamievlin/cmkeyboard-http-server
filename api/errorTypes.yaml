@@ -1,0 +1,21 @@
+baseTypes:
+  errorMsg:
+    type: object
+    properties:
+      message:
+        description: Error message
+        type: string
+
+errorCodes:
+  400:
+    description: Bad request
+    content:
+      application/json:
+        schema:
+          $ref: '#/baseTypes/errorMsg'
+  500:
+    description: SDK or error in server component
+    content:
+      application/json:
+        schema:
+          $ref: '#/baseTypes/errorMsg'

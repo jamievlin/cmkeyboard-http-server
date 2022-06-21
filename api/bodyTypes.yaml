@@ -1,0 +1,20 @@
+baseTypes:
+  byte:
+    type: integer
+    minimum: 0
+    maximum: 255
+
+requestTypes:
+  RGBColor:
+    type: object
+    properties:
+      red:
+        $ref: '#/baseTypes/byte'
+      green:
+        $ref: '#/baseTypes/byte'
+      blue:
+        $ref: '#/baseTypes/byte'
+    required:
+      - red
+      - green
+      - blue

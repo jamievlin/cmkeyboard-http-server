@@ -6,6 +6,8 @@
   <component name="SwUserDefinedSpecifications">
     <option name="specTypeByUrl">
       <map>
+        <entry key="file://$PROJECT_DIR$/api/bodyTypes.yaml" value="openapi30" />
+        <entry key="file://$PROJECT_DIR$/api/errorTypes.yaml" value="openapi30" />
         <entry key="file://$PROJECT_DIR$/api/paramObjects.yaml" value="openapi30" />
       </map>
     </option>
