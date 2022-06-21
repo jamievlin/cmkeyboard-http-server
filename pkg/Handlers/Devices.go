@@ -24,15 +24,18 @@ import (
 func createDeviceHandler() http.Handler {
 	router := httprouter.New()
 
-	router.PUT("/:device", putDeviceLedControl)
-	router.GET("/:device", getDevicesPluggedIn)
-	router.OPTIONS("/:device", createOptionsHandler(&[]string{"GET", "PUT"}))
+	devicePath := "/:device"
+	router.PUT(devicePath, putDeviceLedControl)
+	router.GET(devicePath, getDevicesPluggedIn)
+	router.OPTIONS(devicePath, createOptionsHandler(&[]string{"GET", "PUT"}))
 
-	router.PUT("/:device/color", putDeviceColor)
-	router.OPTIONS("/:device/color", createOptionsHandler(&[]string{"PUT"}))
+	deviceColorPath := "/:device/color"
+	router.PUT(deviceColorPath, putDeviceColor)
+	router.OPTIONS(deviceColorPath, createOptionsHandler(&[]string{"PUT"}))
 
-	router.PUT("/:device/color/:row/:col", putDeviceKeyColor)
-	router.OPTIONS("/:device/color/:row/:col", createOptionsHandler(&[]string{"PUT"}))
+	deviceColorRowColPath := "/:device/color/:row/:col"
+	router.PUT(deviceColorRowColPath, putDeviceKeyColor)
+	router.OPTIONS(deviceColorRowColPath, createOptionsHandler(&[]string{"PUT"}))
 	return router
 }
 
