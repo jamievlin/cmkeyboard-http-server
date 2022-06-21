@@ -1,0 +1,65 @@
+openapi: 3.0.0
+info:
+  version: 0.0.1
+  title: CMSDK Lighting control API
+  description: REST API to control RGB lighting for CoolerMaster hardware
+
+servers:
+  - description: localhost server
+    url: http://localhost:10007/api/v1
+
+paths:
+  /sdkversion:
+    get:
+      description: Gets the API Version.
+      operationId: getSdkVersion
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - version
+                properties:
+                  version:
+                    description: Version number for Coolermaster SDK
+                    type: integer
+                    example: 24
+  /sys/peakvolume:
+    get:
+      description: Gets the peak volume
+      operationId: getSysPeakVolume
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - peak_volume
+                properties:
+                  peak_volume:
+                    description: Peak volume, in the range 0 - 1
+                    type: number
+                    example: 0.15
+  /sys/ram:
+    get:
+      description: Gets the peak volume
+      operationId: getSysRamPercentage
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - ram_percentage
+                properties:
+                  ram_percentage:
+                    description: Ram percentage between 0 - 100
+                    type: number
+                    example: 35
