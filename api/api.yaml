@@ -68,7 +68,7 @@ paths:
       description: Get hardware information about device
       operationId: getDeviceInfo
       parameters:
-        - $ref: 'paramObjects.yaml#/parameters/device'
+        - $ref: './paramObjects.yaml#/parameters/device'
       responses:
         '200':
           description: Successful response
@@ -89,7 +89,7 @@ paths:
       description: Set device RGB properties
       operationId: putDeviceInfo
       parameters:
-        - $ref: 'paramObjects.yaml#/parameters/device'
+        - $ref: './paramObjects.yaml#/parameters/device'
       requestBody:
         required: true
         content:
