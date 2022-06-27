@@ -1,20 +1,19 @@
-baseTypes:
-  byte:
-    type: integer
-    minimum: 0
-    maximum: 255
-
-requestTypes:
-  RGBColor:
-    type: object
-    properties:
-      red:
-        $ref: './bodyTypes.yaml#/baseTypes/byte'
-      green:
-        $ref: './bodyTypes.yaml#/baseTypes/byte'
-      blue:
-        $ref: './bodyTypes.yaml#/baseTypes/byte'
-    required:
-      - red
-      - green
-      - blue
+components:
+  schemas:
+    byte:
+      type: integer
+      minimum: 0
+      maximum: 255
+    RGBColor:
+      type: object
+      properties:
+        red:
+          $ref: '#/components/schemas/byte'
+        green:
+          $ref: '#/components/schemas/byte'
+        blue:
+          $ref: '#/components/schemas/byte'
+      required:
+        - red
+        - green
+        - blue

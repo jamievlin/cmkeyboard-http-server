@@ -68,7 +68,7 @@ paths:
       description: Get hardware information about device
       operationId: getDeviceInfo
       parameters:
-        - $ref: './paramObjects.yaml#/parameters/device'
+        - $ref: './paramObjects.yaml#/components/parameters/device'
       responses:
         '200':
           description: Successful response
@@ -84,12 +84,12 @@ paths:
                     type: boolean
                     example: true
         '500':
-          $ref: './errorTypes.yaml#/errorCodes/500'
+          $ref: './errorTypes.yaml#/components/responses/500'
     put:
       description: Set device RGB properties
       operationId: putDeviceInfo
       parameters:
-        - $ref: './paramObjects.yaml#/parameters/device'
+        - $ref: './paramObjects.yaml#/components/parameters/device'
       requestBody:
         required: true
         content:
@@ -108,15 +108,15 @@ paths:
         '200':
           description: Successful
         '400':
-          $ref: './errorTypes.yaml#/errorCodes/400'
+          $ref: './errorTypes.yaml#/components/responses/400'
         '500':
-          $ref: './errorTypes.yaml#/errorCodes/500'
+          $ref: './errorTypes.yaml#/components/responses/500'
   /devices/{device}/color/{row}/{col}:
     put:
       description: Set individual key's RGB Color
       operationId: putDeviceColorKey
       parameters:
-        - $ref: './paramObjects.yaml#/parameters/device'
+        - $ref: './paramObjects.yaml#/components/parameters/device'
         - in: path
           name: row
           required: true
@@ -140,11 +140,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './bodyTypes.yaml#/requestTypes/RGBColor'
+              $ref: 'bodyTypes.yaml#/components/schemas/RGBColor'
       responses:
         '200':
           description: Successful
         '400':
-          $ref: './errorTypes.yaml#/errorCodes/400'
+          $ref: './errorTypes.yaml#/components/responses/400'
         '500':
-          $ref: './errorTypes.yaml#/errorCodes/500'
+          $ref: './errorTypes.yaml#/components/responses/500'

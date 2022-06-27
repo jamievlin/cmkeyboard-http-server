@@ -1,21 +1,21 @@
-baseTypes:
-  errorMsg:
-    type: object
-    properties:
-      message:
-        description: Error message
-        type: string
-
-errorCodes:
-  400:
-    description: Bad request
-    content:
-      application/json:
-        schema:
-          $ref: './errorTypes.yaml#/baseTypes/errorMsg'
-  500:
-    description: SDK or error in server component
-    content:
-      application/json:
-        schema:
-          $ref: './errorTypes.yaml#/baseTypes/errorMsg'
+components:
+  schemas:
+    errorMsg:
+      type: object
+      properties:
+        message:
+          description: Error message
+          type: string
+  responses:
+    400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorMsg'
+    500:
+      description: SDK or error in server component
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorMsg'
