@@ -148,3 +148,36 @@ paths:
           $ref: './errorTypes.yaml#/components/responses/400'
         '500':
           $ref: './errorTypes.yaml#/components/responses/500'
+  /devices/{device}/color:
+    put:
+      description: Set RGB lighting for all keys
+      operationId: putDeviceColor
+      parameters:
+        - $ref: './paramObjects.yaml#/components/parameters/device'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - mode
+                - body
+              properties:
+                mode:
+                  type: string
+                  enum:
+                    - all
+                    - matrix
+                  default: all
+                body:
+                  oneOf:
+                    - $ref: 'bodyTypes.yaml#/components/schemas/RGBColor'
+                    - $ref: 'bodyTypes.yaml#/components/schemas/RGBMatrix'
+      responses:
+        '200':
+          description: Successful
+        '400':
+          $ref: './errorTypes.yaml#/components/responses/400'
+        '500':
+          $ref: './errorTypes.yaml#/components/responses/500'

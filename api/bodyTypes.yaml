@@ -17,3 +17,18 @@ components:
         - red
         - green
         - blue
+    RGBMatrix:
+      type: array
+      description: RGB Matrix for keyboard
+      minimum: 7
+      maximum: 7
+      exclusiveMaximum: false
+      exclusiveMinimum: false
+      items:
+        type: array
+        minimum: 24
+        maximum: 24
+        exclusiveMinimum: false
+        exclusiveMaximum: false
+        items:
+          $ref: '#/components/schemas/RGBColor'
