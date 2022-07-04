@@ -17,11 +17,27 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	Loggers "jamievlin.github.io/cmkeyboard-http-server/internal"
 	"jamievlin.github.io/cmkeyboard-http-server/pkg/CInterface"
 	"jamievlin.github.io/cmkeyboard-http-server/pkg/Handlers"
 	"net/http"
 )
+
+type args struct {
+	LogDir  *string
+	LogMode *string
+	Port    *uint
+}
+
+func getArgStruct() args {
+	return args{
+		flag.String("logdir", "logs", "Directory to store log file. Ignored if logmode"),
+		flag.String("logmode", "stderr", "Mode to log the file. Must be stderr, file or none"),
+		flag.Uint("port", 10007, "Port of the server."),
+	}
+}
 
 func initMux(prefix string) *http.ServeMux {
 	mux := http.NewServeMux()
@@ -34,20 +50,35 @@ func initMux(prefix string) *http.ServeMux {
 	return mux
 }
 
+func initializeLogger(arg args) {
+	if *arg.LogMode == "none" {
+		Loggers.InitializeLoggerDevNull()
+	} else if *arg.LogMode == "stderr" {
+		Loggers.InitializeLoggerToStderr()
+	} else if *arg.LogMode == "file" {
+		Loggers.InitializeLoggerDirectory(*arg.LogDir)
+	}
+}
+
 func main() {
 	defer func() {
+		Loggers.InfoLogger.Print("Program exit.")
 		err := CInterface.EnableLedControl(false, 1)
 		if err != nil {
 			Loggers.ErrorLogger.Printf("Error in disabling LED Control")
 		}
 	}()
 
-	Loggers.InitializeLoggerToStderr()
+	arg := getArgStruct()
+	flag.Parse()
+
+	initializeLogger(arg)
 
 	Loggers.InfoLogger.Printf("SDK Version %d", CInterface.GetCMSDKDllVer())
 
 	mux := initMux("/api/v1")
-	err := http.ListenAndServe(":10007", mux)
+	addr := fmt.Sprintf("127.0.0.1:%d", *arg.Port)
+	err := http.ListenAndServe(addr, mux)
 	if err != nil {
 		Loggers.ErrorLogger.Fatal(err)
 	}
