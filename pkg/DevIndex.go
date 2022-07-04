@@ -16,18 +16,54 @@
 
 package pkg
 
-import "strconv"
+import (
+	"fmt"
+)
 
 type DeviceIndex uint16
 
 const (
-	MKeysL  DeviceIndex = 0
-	MKeysS  DeviceIndex = 1
-	MK750   DeviceIndex = 10
-	Default DeviceIndex = 0xffff
+	MKeysL      DeviceIndex = 0
+	MKeysS      DeviceIndex = 1
+	MKeysLWhite DeviceIndex = 2
+	MKeysMWhite DeviceIndex = 3
+	MMouseL     DeviceIndex = 4
+	MMouseS     DeviceIndex = 5
+	MKeysM      DeviceIndex = 6
+	MKeysSWhite DeviceIndex = 7
+	MM520       DeviceIndex = 8
+	MM530       DeviceIndex = 9
+	MK750       DeviceIndex = 10
+	CK372       DeviceIndex = 11
+	CK550and552 DeviceIndex = 12
+	CK551       DeviceIndex = 13
+	Default     DeviceIndex = 0xffff
 )
 
-func GetDeviceIndexFromString(input string) (DeviceIndex, error) {
-	devInt, err := strconv.Atoi(input)
-	return DeviceIndex(devInt), err
+// from SDKDLL.h
+var deviceMap = map[string]DeviceIndex{
+	"MasterKeys_L":       MKeysL,
+	"MasterKeys_S":       MKeysS,
+	"MasterKeys_L_White": MKeysLWhite,
+	"MasterKeys_M_White": MKeysMWhite,
+	"MasterMouse_L":      MMouseL,
+	"MasterMouse_S":      MMouseS,
+	"MasterKeys_M":       MKeysM,
+	"MasterKeys_S_White": MKeysSWhite,
+	"MM520":              MM520,
+	"MM530":              MM530,
+	"MK750":              MK750,
+	"CK372":              CK372,
+	"CK550":              CK550and552,
+	"CK552":              CK550and552,
+	"CK551":              CK551,
+	"Default":            Default,
+}
+
+func GetDeviceIndexFromDevName(devName string) (DeviceIndex, error) {
+	if result, ok := deviceMap[devName]; ok {
+		return result, nil
+	} else {
+		return 0, fmt.Errorf("device %s not found", devName)
+	}
 }

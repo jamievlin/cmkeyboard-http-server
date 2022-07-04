@@ -1,4 +1,24 @@
 components:
+  schemas:
+    deviceName:
+      type: string
+      enum:
+        - MasterKeys_L
+        - MasterKeys_S
+        - MasterKeys_L_White
+        - MasterKeys_M_White
+        - MasterMouse_L
+        - MasterMouse_S
+        - MasterKeys_M
+        - MasterKeys_S_White
+        - MM520
+        - MM530
+        - MK750
+        - CK372
+        - CK550
+        - CK552
+        - CK551
+        - Default
   parameters:
     device:
       name: device
@@ -6,4 +26,4 @@ components:
       description: Device number, as per Coolermaster SDK documentation
       required: true
       schema:
-        type: integer
+        $ref: '#/components/schemas/deviceName'

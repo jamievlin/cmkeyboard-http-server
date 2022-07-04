@@ -64,7 +64,7 @@ func ReturnError(writer http.ResponseWriter, response *ErrorResponse, status int
 }
 
 func RetrieveDeviceIndexOrLog(dev string, writer http.ResponseWriter) (DeviceIndex, error) {
-	devInt, err := GetDeviceIndexFromString(dev)
+	devInt, err := GetDeviceIndexFromDevName(dev)
 	if err != nil {
 		var errorMsg = fmt.Sprintf("Device %s unknown", dev)
 		Loggers.ErrorLogger.Print(errorMsg)
