@@ -42,6 +42,8 @@ func main() {
 		}
 	}()
 
+	Loggers.InitializeLoggerToStderr()
+
 	Loggers.InfoLogger.Printf("SDK Version %d", CInterface.GetCMSDKDllVer())
 
 	mux := initMux("/api/v1")
